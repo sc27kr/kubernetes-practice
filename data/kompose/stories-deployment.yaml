@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --file docker-compose.yaml --out ./kompose
+    kompose.version: 1.31.2 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: stories
+  name: stories
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: stories
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --file docker-compose.yaml --out ./kompose
+        kompose.version: 1.31.2 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/data-default: "true"
+        io.kompose.service: stories
+    spec:
+      containers:
+        - image: stories
+          name: stories
+          ports:
+            - containerPort: 3000
+              hostPort: 80
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /app/story
+              name: stories
+      restartPolicy: Always
+      volumes:
+        - name: stories
+          persistentVolumeClaim:
+            claimName: stories
+status: {}
